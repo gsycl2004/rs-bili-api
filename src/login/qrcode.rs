@@ -1,19 +1,11 @@
-use std::f32::consts::E;
-use std::fmt::format;
-use std::fs::File;
 use std::time::Duration;
 use qrcode::QrCode;
-use reqwest::Client;
-use reqwest::cookie::{Cookie, Jar};
-
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
-
-use crate::err::{BiliApiResult};
+use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::NoneError;
 use crate::internal::{RetData, Session};
 use crate::login::qrcode::PollEnum::{Expire, Success, UnConfirmed, UnScanned};
-
 
 #[derive(Deserialize, Serialize)]
 pub struct LoginQRCode {
@@ -30,15 +22,15 @@ pub struct LoginPoll {
     message: String,
 }
 
-pub enum  PollEnum{
-    Success(LoginPoll,Session),
+pub enum PollEnum {
+    Success(LoginPoll, Session),
     Expire(LoginPoll),
     UnScanned(LoginPoll),
     UnConfirmed(LoginPoll),
 }
 
 
-pub(crate) fn encode(url:impl AsRef<[u8]>) -> String {
+pub(crate) fn encode(url: impl AsRef<[u8]>) -> String {
     let qrcode = QrCode::new(url).unwrap();
     return qrcode.render::<char>()
         .quiet_zone(false)
@@ -48,33 +40,31 @@ pub(crate) fn encode(url:impl AsRef<[u8]>) -> String {
 }
 
 
-pub async fn login(qrcode_handler:fn(text:&String))-> BiliApiResult<Session>{
+pub async fn login(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> {
     let qr = generate().await;
-    let LoginQRCode{url,qrcode_key} = qr.unwrap();
+    let LoginQRCode { url, qrcode_key } = qr.unwrap();
     qrcode_handler(&encode(&url));
     loop {
-        if let PollEnum::Success(_poll, session) = poll(&qrcode_key).await.unwrap(){
+        if let PollEnum::Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
             return Ok(session);
         }
         sleep(Duration::from_secs(1)).await;
-
-
     }
 }
 
-pub async fn poll(qrcode_key:impl Into<&String>)->BiliApiResult<PollEnum>{
+pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
     let session = Session::new();
-    let req = session.client.get(format!("https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={}",qrcode_key.into())).build()?;
-    let resp =  session.client.execute(req).await?.json::<RetData<LoginPoll>>().await?;
+    let req = session.client.get(format!("https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={}", qrcode_key.into())).build()?;
+    let resp = session.client.execute(req).await?.json::<RetData<LoginPoll>>().await?;
     if resp.code == 0 {
         return Ok(match resp.data.code {
             0 => {
-                Success(resp.data,session)
+                Success(resp.data, session)
             }
-            86038 =>{
+            86038 => {
                 Expire(resp.data)
             }
-            86090 =>{
+            86090 => {
                 UnConfirmed(resp.data)
             }
             86101 => {
@@ -83,10 +73,9 @@ pub async fn poll(qrcode_key:impl Into<&String>)->BiliApiResult<PollEnum>{
             _ => {
                 UnConfirmed(resp.data)
             }
-        })
+        });
     }
     Err(NoneError)
-
 }
 
 pub async fn generate() -> BiliApiResult<LoginQRCode> {
@@ -101,17 +90,11 @@ pub async fn generate() -> BiliApiResult<LoginQRCode> {
 
 #[cfg(test)]
 mod test {
-
-
-
-
-    use crate::login::qrcode::{ generate, login, LoginQRCode, poll, PollEnum};
+    use crate::login::qrcode::login;
 
     #[tokio::test]
-    async fn test(){
-        let p = login(|x|{ println!("{}",x) }).await.unwrap();
-        println!("{:?}",p.cookie_store);
+    async fn test() {
+        let p = login(|x| { println!("{}", x) }).await.unwrap();
+        println!("{:?}", p.cookie_store);
     }
-
-
 }
