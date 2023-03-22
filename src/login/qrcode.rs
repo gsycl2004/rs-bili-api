@@ -1,11 +1,15 @@
 use std::time::Duration;
 use qrcode::QrCode;
+
+
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
-use crate::err::BiliApiResult;
-use crate::err::BiliBiliApiError::NoneError;
+
+use crate::err::{BiliApiResult};
+use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
 use crate::login::qrcode::PollEnum::{Expire, Success, UnConfirmed, UnScanned};
+
 
 #[derive(Deserialize, Serialize)]
 pub struct LoginQRCode {
@@ -75,7 +79,7 @@ pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
             }
         });
     }
-    Err(NoneError)
+    Err(ErrorCode(resp.message, resp.code))
 }
 
 pub async fn generate() -> BiliApiResult<LoginQRCode> {
@@ -84,13 +88,13 @@ pub async fn generate() -> BiliApiResult<LoginQRCode> {
     if p.code == 0 {
         return Ok(p.data);
     }
-    Err(NoneError)
+    p.into()
 }
 
 
 #[cfg(test)]
 mod test {
-    use crate::login::qrcode::login;
+    use crate::login::qrcode::{generate, login, LoginQRCode, poll, PollEnum};
 
     #[tokio::test]
     async fn test() {

@@ -3,7 +3,7 @@ pub type BiliApiResult<T> = Result<T,BiliBiliApiError>;
 #[derive(Debug)]
 pub enum BiliBiliApiError{
     ReqwestError(reqwest::Error),
-    NoneError,
+    ErrorCode(String,i64),
     SerdeJsonError(serde_json::Error),
 }
 
