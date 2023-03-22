@@ -5,7 +5,9 @@ macro_rules! define_api {
         pub(crate) fn [<call_ $name>]($(
         $arg_name:$arg_type,
         )*){
-                let url = format("{}")
+                let args = stringify!($($arg_name={},)*);
+                println!("{}?{}",args);
+
 
             }
 
@@ -23,6 +25,6 @@ mod test {
     #[test]
     fn t() {
 
-        call_api(na)
+        call_api(String::from("happy"))
     }
 }
