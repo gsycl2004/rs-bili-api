@@ -1,8 +1,10 @@
-use std::fmt::Error;
+
 use std::sync::Arc;
+
 use reqwest::Client;
 use reqwest_cookie_store::{CookieStore, CookieStoreMutex};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 
@@ -13,9 +15,9 @@ pub(crate) struct RetData<T>{
     pub data:T
 }
 
-impl <T> Into<BiliApiResult<T>>  for RetData<T>{
-    fn into(self) -> BiliApiResult<T> {
-        Err(ErrorCode(self.message,self.code))
+impl <T> From<RetData<T>> for BiliApiResult<T>{
+    fn from(value: RetData<T>) -> Self {
+        Err(ErrorCode(value.message,value.code))
     }
 }
 

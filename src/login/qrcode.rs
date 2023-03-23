@@ -4,7 +4,7 @@ use qrcode::QrCode;
 
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
-
+use crate::{define_api};
 use crate::err::{BiliApiResult};
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
@@ -33,12 +33,12 @@ pub enum PollEnum {
     UnConfirmed(LoginPoll),
 }
 
-
+define_api!(poll,"https://passport.bilibili.com/x/passport-login/web/qrcode/poll",qrcode_key,&String);
 pub(crate) fn encode(url: impl AsRef<[u8]>) -> String {
     let qrcode = QrCode::new(url).unwrap();
     return qrcode.render::<char>()
         .quiet_zone(false)
-        .module_dimensions(3, 1)
+        .module_dimensions(2, 1)
 
         .build();
 }
@@ -49,7 +49,7 @@ pub async fn login(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> 
     let LoginQRCode { url, qrcode_key } = qr.unwrap();
     qrcode_handler(&encode(&url));
     loop {
-        if let PollEnum::Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
+        if let Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
             return Ok(session);
         }
         sleep(Duration::from_secs(1)).await;
@@ -58,7 +58,7 @@ pub async fn login(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> 
 
 pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
     let session = Session::new();
-    let req = session.client.get(format!("https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key={}", qrcode_key.into())).build()?;
+    let req = call_poll(qrcode_key.into());
     let resp = session.client.execute(req).await?.json::<RetData<LoginPoll>>().await?;
     if resp.code == 0 {
         return Ok(match resp.data.code {

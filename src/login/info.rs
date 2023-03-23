@@ -1,11 +1,13 @@
-use crate::err::BiliApiResult;
+use serde::{Deserialize};
+use serde_json::Value;
 
+use crate::err::BiliApiResult;
 use crate::internal::{RetData, Session};
-use serde::{Serialize,Deserialize};
+
 ///[详细信息](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/login/login_info.md)
 
 
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Deserialize,Debug)]
 pub struct Nav {
     pub isLogin: bool,
     pub email_verified: i64,
@@ -33,39 +35,55 @@ pub struct Nav {
     pub allowance_count:i32,
     pub answer_status:i32
 }
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Deserialize,Debug)]
 pub struct Wallet {
     pub mid: i64,
     pub bcoin_balance: i64,
     pub coupon_balance: i64,
     pub coupon_due_time: i64,
 }
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Deserialize,Debug)]
 pub struct VipLabel {
     pub path: String,
     pub text: String,
     pub label_theme: String,
 }
-#[derive(Serialize,Deserialize,Debug)]
+
+
+#[derive(Deserialize,Debug)]
 pub struct Pendant {
     pub pid: i64,
     pub name: String,
     pub image: String,
     pub expire: i64,
 }
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Deserialize,Debug)]
 pub struct Official {
+    pub role:i32,
+    pub title:String,
+    pub desc:String,
     #[serde(rename(serialize = "type", deserialize = "type"))]
-    pub type_name: i64,
+    pub type_name: i8,
+}
+
+
+#[derive(Deserialize,Debug)]
+pub struct OfficialVerify{
+    #[serde(rename(serialize = "type", deserialize = "type"))]
+    pub type_name: i8,
     pub desc: String,
 }
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Deserialize,Debug)]
 pub struct LevelInfo {
     pub current_level: i64,
     pub current_min: i64,
     pub current_exp: i64,
-    pub next_exp: i64,
+    //可能同时返回String和i64
+    pub next_exp: Value,
+
 }
+
+
 ///# 获取导航栏用户信息
 ///[详细信息](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/login/login_info.md#%E5%AF%BC%E8%88%AA%E6%A0%8F%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF)
 async fn nav(session: &Session) -> BiliApiResult<Nav> {
@@ -87,7 +105,6 @@ async fn nav(session: &Session) -> BiliApiResult<Nav> {
 
 #[cfg(test)]
 mod test{
-
     use crate::login::info::nav;
     use crate::login::qrcode::login;
 
