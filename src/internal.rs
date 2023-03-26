@@ -37,10 +37,16 @@ impl Session {
                 .unwrap(),
         }
     }
+
+    pub(crate) fn get_csrf(&self) -> String{
+        self.cookie_store.lock().unwrap().get("bilibili.com", "/", "bili_jct").unwrap().value().to_string()
+    }
 }
 
 #[cfg(test)]
 mod test {
     #[tokio::test]
-    async fn test() {}
+    async fn test() {
+
+    }
 }

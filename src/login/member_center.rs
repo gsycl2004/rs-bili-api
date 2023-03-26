@@ -6,14 +6,14 @@ use paste::paste;
 use reqwest::{Method, Request, Url};
 use serde::Deserialize;
 
-use crate::define_api;
+use crate::define_api_get;
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
 
-define_api!(account,"https://api.bilibili.com/x/member/web/account",);
-define_api!(reward,"https://api.bilibili.com/x/member/web/exp/reward",);
-define_api!(exp,"https://www.bilibili.com/plus/account/exp.php",);
+define_api_get!(account,"https://api.bilibili.com/x/member/web/account",);
+define_api_get!(reward,"https://api.bilibili.com/x/member/web/exp/reward",);
+define_api_get!(exp,"https://www.bilibili.com/plus/account/exp.php",);
 
 #[derive(Deserialize, Debug)]
 pub struct AccountData {

@@ -1,9 +1,8 @@
-#[macro_export] macro_rules! define_api {
-    ($name:ident,$url:literal,$($arg_name:ident,$arg_type:ty),*) => {
-
+#[macro_export] macro_rules! define_api_get {
+    ($name:ident,$url:literal,$($arg_name:ident),*) => {
         paste!{
         pub(crate) fn [<call_ $name>]($(
-        $arg_name:$arg_type,
+        $arg_name:&String,
         )*)->Request{
                 let mut args = String::from($url);
                 args += "?";
@@ -21,6 +20,28 @@
         }
     }
 }
+
+#[macro_export] macro_rules! define_api_post {
+    ($name:ident,$url:literal,$($arg_name:ident),*) => {
+        paste!{
+        pub(crate) fn [<call_ $name>](client:&Client,
+        $(
+        $arg_name:&str,
+        )*
+        )->Request{
+                let mut args:HashMap<&str,&str> = HashMap::new();
+                $(
+                    args.insert(stringify!($arg_name),$arg_name);
+                )*
+                let b = client.post($url).form(&args).build().unwrap();
+                b
+            }
+
+        }
+    }
+}
+
+
 
 
 

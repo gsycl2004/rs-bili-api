@@ -7,7 +7,7 @@ use reqwest::{Method, Request, Url};
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 
-use crate::define_api;
+use crate::{define_api_get};
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
@@ -35,7 +35,7 @@ pub enum PollEnum {
     UnConfirmed(LoginPoll),
 }
 
-define_api!(poll,"https://passport.bilibili.com/x/passport-login/web/qrcode/poll",qrcode_key,&String);
+define_api_get!(poll,"https://passport.bilibili.com/x/passport-login/web/qrcode/poll",qrcode_key);
 pub(crate) fn encode(url: impl AsRef<[u8]>) -> String {
     let qrcode = QrCode::new(url).unwrap();
     return qrcode.render::<char>()
