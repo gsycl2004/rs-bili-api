@@ -1,5 +1,3 @@
-
-
 #[macro_export] macro_rules! define_api {
     ($name:ident,$url:literal,$($arg_name:ident,$arg_type:ty),*) => {
 

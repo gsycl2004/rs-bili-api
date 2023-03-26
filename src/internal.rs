@@ -1,4 +1,3 @@
-
 use std::sync::Arc;
 
 use reqwest::Client;
@@ -8,48 +7,40 @@ use serde::{Deserialize, Serialize};
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 
-#[derive(Serialize,Deserialize)]
-pub(crate) struct RetData<T>{
-    pub code:i64,
-    pub message:String,
-    pub data:T
+#[derive(Serialize, Deserialize)]
+pub(crate) struct RetData<T> {
+    pub code: i64,
+    pub message: String,
+    pub data: T,
 }
 
-impl <T> From<RetData<T>> for BiliApiResult<T>{
+impl<T> From<RetData<T>> for BiliApiResult<T> {
     fn from(value: RetData<T>) -> Self {
-        Err(ErrorCode(value.message,value.code))
+        Err(ErrorCode(value.message, value.code))
     }
 }
 
 
-pub struct Session{
-    pub(crate) cookie_store:Arc<CookieStoreMutex>,
-    pub(crate) client:Client
+pub struct Session {
+    pub(crate) cookie_store: Arc<CookieStoreMutex>,
+    pub(crate) client: Client,
 }
 
 impl Session {
-    pub(crate) fn new()->Session{
+    pub(crate) fn new() -> Session {
         let p = Arc::new(CookieStoreMutex::new(CookieStore::default()));
-        Session{
-            cookie_store:Arc::clone(&p),
-            client:Client::builder().cookie_store(true)
+        Session {
+            cookie_store: Arc::clone(&p),
+            client: Client::builder().cookie_store(true)
                 .cookie_provider(Arc::clone(&p))
                 .build()
                 .unwrap(),
         }
     }
-
 }
 
 #[cfg(test)]
-mod test{
-
-
-
+mod test {
     #[tokio::test]
-    async fn test(){
-
-
-
-    }
+    async fn test() {}
 }

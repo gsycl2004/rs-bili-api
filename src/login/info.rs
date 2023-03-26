@@ -1,13 +1,11 @@
-use serde::{Deserialize};
+use serde::Deserialize;
 use serde_json::Value;
 
 use crate::err::BiliApiResult;
 use crate::internal::{RetData, Session};
 
 ///[详细信息](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/login/login_info.md)
-
-
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Nav {
     pub isLogin: bool,
     pub email_verified: i64,
@@ -29,20 +27,22 @@ pub struct Nav {
     pub vip_label: VipLabel,
     pub vip_avatar_subscript: i8,
     pub vip_nickname_color: String,
-    pub wallet:Wallet,
-    pub has_shop:bool,
-    pub shop_url:String,
-    pub allowance_count:i32,
-    pub answer_status:i32
+    pub wallet: Wallet,
+    pub has_shop: bool,
+    pub shop_url: String,
+    pub allowance_count: i32,
+    pub answer_status: i32,
 }
-#[derive(Deserialize,Debug)]
+
+#[derive(Deserialize, Debug)]
 pub struct Wallet {
     pub mid: i64,
     pub bcoin_balance: i64,
     pub coupon_balance: i64,
     pub coupon_due_time: i64,
 }
-#[derive(Deserialize,Debug)]
+
+#[derive(Deserialize, Debug)]
 pub struct VipLabel {
     pub path: String,
     pub text: String,
@@ -50,30 +50,32 @@ pub struct VipLabel {
 }
 
 
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Pendant {
     pub pid: i64,
     pub name: String,
     pub image: String,
     pub expire: i64,
 }
-#[derive(Deserialize,Debug)]
+
+#[derive(Deserialize, Debug)]
 pub struct Official {
-    pub role:i32,
-    pub title:String,
-    pub desc:String,
+    pub role: i32,
+    pub title: String,
+    pub desc: String,
     #[serde(rename(serialize = "type", deserialize = "type"))]
     pub type_name: i8,
 }
 
 
-#[derive(Deserialize,Debug)]
-pub struct OfficialVerify{
+#[derive(Deserialize, Debug)]
+pub struct OfficialVerify {
     #[serde(rename(serialize = "type", deserialize = "type"))]
     pub type_name: i8,
     pub desc: String,
 }
-#[derive(Deserialize,Debug)]
+
+#[derive(Deserialize, Debug)]
 pub struct LevelInfo {
     pub current_level: i64,
     pub current_min: i64,
@@ -104,16 +106,16 @@ async fn nav(session: &Session) -> BiliApiResult<Nav> {
 }
 
 #[cfg(test)]
-mod test{
+mod test {
     use crate::login::info::nav;
     use crate::login::qrcode::login;
 
     #[tokio::test]
-    async fn test(){
-        let session = login(|x|{
-            println!("{}",x);
+    async fn test() {
+        let session = login(|x| {
+            println!("{}", x);
         }).await.unwrap();
         let t = nav(&session).await.unwrap();
-        println!("{:?}",t);
+        println!("{:?}", t);
     }
 }

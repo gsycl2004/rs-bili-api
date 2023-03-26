@@ -6,7 +6,6 @@ use paste::paste;
 use reqwest::{Method, Request, Url};
 use serde::Deserialize;
 
-
 use crate::define_api;
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;

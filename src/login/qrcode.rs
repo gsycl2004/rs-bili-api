@@ -1,17 +1,17 @@
+use std::borrow::Borrow;
 use std::time::Duration;
+
+use paste::paste;
 use qrcode::QrCode;
-
-
+use reqwest::{Method, Request, Url};
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
-use crate::{define_api};
-use paste::paste;
-use std::borrow::Borrow;
-use crate::err::{BiliApiResult};
+
+use crate::define_api;
+use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
 use crate::login::qrcode::PollEnum::{Expire, Success, UnConfirmed, UnScanned};
-use reqwest::{Method, Request, Url};
 
 #[derive(Deserialize, Serialize)]
 pub struct LoginQRCode {
@@ -45,7 +45,7 @@ pub(crate) fn encode(url: impl AsRef<[u8]>) -> String {
         .build();
 }
 
-#[deprecated()]
+
 pub async fn login(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> {
     let qr = generate().await;
     let LoginQRCode { url, qrcode_key } = qr.unwrap();
