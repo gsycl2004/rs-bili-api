@@ -54,7 +54,7 @@ pub async fn account(session: &Session) -> BiliApiResult<AccountData> {
         .await?;
 
     if result.code == 0 {
-        return Ok(result.data);
+        return Ok(result.data.unwrap());
     }
     result.into()
 }
@@ -66,7 +66,7 @@ pub async fn reward(session: &Session) -> BiliApiResult<RewardData> {
         .json::<RetData<RewardData>>()
         .await?;
     if result.code == 0 {
-        return Ok(result.data);
+        return Ok(result.data.unwrap());
     }
     result.into()
 }

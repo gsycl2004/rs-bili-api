@@ -63,21 +63,22 @@ pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
     let req = call_poll(qrcode_key.into());
     let resp = session.client.execute(req).await?.json::<RetData<LoginPoll>>().await?;
     if resp.code == 0 {
-        return Ok(match resp.data.code {
+        let resp  = resp.data.unwrap();
+        return Ok(match resp.code {
             0 => {
-                Success(resp.data, session)
+                Success(resp, session)
             }
             86038 => {
-                Expire(resp.data)
+                Expire(resp)
             }
             86090 => {
-                UnConfirmed(resp.data)
+                UnConfirmed(resp)
             }
             86101 => {
-                UnScanned(resp.data)
+                UnScanned(resp)
             }
             _ => {
-                UnConfirmed(resp.data)
+                UnConfirmed(resp)
             }
         });
     }
@@ -88,7 +89,7 @@ pub async fn generate() -> BiliApiResult<LoginQRCode> {
     let p = reqwest::get("https://passport.bilibili.com/x/passport-login/web/qrcode/generate")
         .await?.json::<RetData<LoginQRCode>>().await?;
     if p.code == 0 {
-        return Ok(p.data);
+        return Ok(p.data.unwrap());
     }
     p.into()
 }

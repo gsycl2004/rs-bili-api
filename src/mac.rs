@@ -29,11 +29,17 @@
         $arg_name:&str,
         )*
         )->Request{
-                let mut args:HashMap<&str,&str> = HashMap::new();
+
+                let mut args:HashMap<String,&str> = HashMap::new();
                 $(
-                    args.insert(stringify!($arg_name),$arg_name);
+                    args.insert(stringify!($arg_name).replace("r#",""),$arg_name);
                 )*
-                let b = client.post($url).form(&args).build().unwrap();
+                println!("{:?}",args);
+                let b = client.post($url)
+                .form(&args)
+                .header("referer","https://www.bilibili.com")
+                .build()
+                .unwrap();
                 b
             }
 

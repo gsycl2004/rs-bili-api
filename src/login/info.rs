@@ -100,7 +100,7 @@ async fn nav(session: &Session) -> BiliApiResult<Nav> {
         .json::<RetData<Nav>>()
         .await?;
     if resp.code == 0 {
-        return Ok(resp.data);
+        return Ok(resp.data.unwrap());
     }
     resp.into()
 }

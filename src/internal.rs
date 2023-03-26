@@ -11,8 +11,12 @@ use crate::err::BiliBiliApiError::ErrorCode;
 pub(crate) struct RetData<T> {
     pub code: i64,
     pub message: String,
-    pub data: T,
+    #[serde(default = "default")]
+    pub data: Option<T>,
 }
+
+fn default<T>()->Option<T>{None}
+
 
 impl<T> From<RetData<T>> for BiliApiResult<T> {
     fn from(value: RetData<T>) -> Self {
