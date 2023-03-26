@@ -1,11 +1,8 @@
 
 
-
 #[macro_export] macro_rules! define_api {
     ($name:ident,$url:literal,$($arg_name:ident,$arg_type:ty),*) => {
-        use paste::paste;
-        use std::borrow::Borrow;
-        use reqwest::{Method, Request, Url};
+
         paste!{
         pub(crate) fn [<call_ $name>]($(
         $arg_name:$arg_type,
@@ -19,9 +16,13 @@
                     args += "&";
                 )*
                 Request::new(Method::GET,Url::parse(&args).unwrap())
+
+
             }
 
         }
     }
 }
+
+
 
