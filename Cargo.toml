@@ -18,3 +18,9 @@ serde = {version="1.0.145",features=["serde_derive"]}
 serde_json = {version="1.0.85"}
 paste = "1.0.12"
 flate2 = "1.0.24"
+
+
+
+[profile.release]
+lto = true
+opt-level= "z"
