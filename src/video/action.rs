@@ -111,19 +111,7 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
     Err(ErrorCode(result.message, result.code))
 
 }
-///[detail](https://api.bilibili.com/x/web-interface/share/add)
-pub async fn share(session:&Session, video:&Video) -> Result<i64, BiliBiliApiError> {
-    let csrf = session.get_csrf();
-    let result = session.client
-        .execute(call_share(&session.client, video.bvid.as_str(), csrf.as_str()))
-        .await?
-        .json::<RetData<i64>>()
-        .await?;
-    if result.code == 0 {
-        return Ok(result.data.unwrap());
-    }
-    Err(ErrorCode(result.message, result.code))
-}
+
 
 
 #[cfg(test)]
@@ -138,10 +126,12 @@ mod test {
             println!("{}", x);
         }).await.unwrap();
         let video = Video {
-            bvid: String::from("BV1TV4y197Ux")
+            bvid: String::from("BV1tX4y1d7bj")
         };
 
+        like(&session, &video, 2).await;
+        coin(&session, &video, 2, false).await;
+        deal(&session, &video, Some(106709609), None).await;
 
-        share(&session,&video).await.unwrap();
     }
 }
