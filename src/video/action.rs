@@ -117,7 +117,7 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
 #[cfg(test)]
 mod test {
     use crate::login::qrcode::login;
-    use crate::video::action::{coin, deal, like, share, triple};
+    use crate::video::action::{coin, deal, like, triple};
     use crate::video::Video;
 
     #[tokio::test]
