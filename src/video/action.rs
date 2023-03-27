@@ -12,7 +12,7 @@ define_api_post!(like,"https://api.bilibili.com/x/web-interface/archive/like",bv
 define_api_post!(coin,"https://api.bilibili.com/x/web-interface/coin/add",bvid,multiply,select_like,csrf);
 define_api_post!(deal,"https://api.bilibili.com/medialist/gateway/coll/resource/deal",rid,r#type,add_media_ids,del_media_ids,csrf);
 define_api_post!(triple,"https://api.bilibili.com/x/web-interface/archive/like/triple",bvid,csrf);
-
+define_api_post!(share,"https://api.bilibili.com/x/web-interface/share/add",bvid,csrf);
 
 
 #[derive(Deserialize, Debug)]
@@ -40,7 +40,7 @@ pub struct TripleResult{
     pub multiply:i32
 }
 
-
+///[detail](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/video/action.md#%E6%8A%95%E5%B8%81%E8%A7%86%E9%A2%91web%E7%AB%AF)
 pub async fn like(session: &Session, video: &Video, like: i8) -> BiliApiResult<()> {
     let csrf = session.get_csrf();
 
@@ -55,7 +55,7 @@ pub async fn like(session: &Session, video: &Video, like: i8) -> BiliApiResult<(
     }
     Err(ErrorCode(result.message, result.code as i64))
 }
-
+///[detail](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/video/action.md#%E6%8A%95%E5%B8%81%E8%A7%86%E9%A2%91web%E7%AB%AF)
 pub async fn coin(session: &Session, video: &Video, multiply: i32, select_like: bool) -> Result<CoinResult, BiliBiliApiError> {
     let csrf = session.get_csrf();
     let result = session.client
@@ -68,7 +68,7 @@ pub async fn coin(session: &Session, video: &Video, multiply: i32, select_like: 
     }
     Err(ErrorCode(result.message, result.code))
 }
-
+///[detail](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/video/action.md#%E6%94%B6%E8%97%8F%E8%A7%86%E9%A2%91%E5%8F%8C%E7%AB%AF)
 pub async fn deal(session: &Session, video: &Video, add_media_ids: Option<i32>, del_media_ids: Option<i32>) -> Result<PromptResult, BiliBiliApiError> {
     let csrf = session.get_csrf();
     let p;
@@ -96,6 +96,7 @@ pub async fn deal(session: &Session, video: &Video, add_media_ids: Option<i32>, 
     Err(ErrorCode(result.message, result.code))
 }
 
+///[detail](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/video/action.md#%E4%B8%80%E9%94%AE%E4%B8%89%E8%BF%9E%E8%A7%86%E9%A2%91app%E7%AB%AF)
 pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
     let csrf = session.get_csrf();
     let result = session.client
@@ -110,12 +111,25 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
     Err(ErrorCode(result.message, result.code))
 
 }
+///[detail](https://api.bilibili.com/x/web-interface/share/add)
+pub async fn share(session:&Session, video:&Video) -> Result<i64, BiliBiliApiError> {
+    let csrf = session.get_csrf();
+    let result = session.client
+        .execute(call_share(&session.client, video.bvid.as_str(), csrf.as_str()))
+        .await?
+        .json::<RetData<i64>>()
+        .await?;
+    if result.code == 0 {
+        return Ok(result.data.unwrap());
+    }
+    Err(ErrorCode(result.message, result.code))
+}
 
 
 #[cfg(test)]
 mod test {
     use crate::login::qrcode::login;
-    use crate::video::action::{coin, deal, like, triple};
+    use crate::video::action::{coin, deal, like, share, triple};
     use crate::video::Video;
 
     #[tokio::test]
@@ -124,12 +138,10 @@ mod test {
             println!("{}", x);
         }).await.unwrap();
         let video = Video {
-            bvid: String::from("BV1hD4y1X7Rm")
+            bvid: String::from("BV1TV4y197Ux")
         };
 
-        like(&session, &video, 2).await;
-        coin(&session, &video, 2, false).await;
-        deal(&session, &video, Some(106709609), None).await;
-        triple(&session,&video).await.unwrap();
+
+        share(&session,&video).await.unwrap();
     }
 }
