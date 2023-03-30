@@ -97,7 +97,7 @@ mod test {
     use reqwest::{header, Method, Request};
 
     use crate::login::member_center::{account, exp, reward, RewardData};
-    use crate::login::qrcode::login;
+    use crate::login::qrcode::{login, QRCodeHandler};
 
     #[test]
     fn t() {}
@@ -105,9 +105,9 @@ mod test {
     #[tokio::test]
     async fn test() {
         let session = login(
-            |x| {
+            QRCodeHandler::Image(|x| {
                 println!("{}", x);
-            }
+            })
         ).await.unwrap();
 
         println!("{:?}", account(&session).await.unwrap());

@@ -116,15 +116,15 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
 
 #[cfg(test)]
 mod test {
-    use crate::login::qrcode::login;
+    use crate::login::qrcode::{login, QRCodeHandler};
     use crate::video::action::{coin, deal, like, triple};
     use crate::video::Video;
 
     #[tokio::test]
     async fn test() {
-        let session = login(|x| {
+        let session = login(QRCodeHandler::Image(|x| {
             println!("{}", x);
-        }).await.unwrap();
+        })).await.unwrap();
         let video = Video {
             bvid: String::from("BV1tX4y1d7bj")
         };

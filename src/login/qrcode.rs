@@ -1,13 +1,20 @@
 use std::borrow::Borrow;
+use std::fmt::format;
+use std::fs::File;
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
+use fast_qr::convert::image::ImageBuilder;
+use fast_qr::convert::{Builder, Shape};
 
+use fast_qr::QRBuilder;
 use paste::paste;
-use qrcode::QrCode;
 use reqwest::{Method, Request, Url};
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
+use uuid::Uuid;
 
-use crate::{define_api_get};
+use crate::define_api_get;
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};
@@ -28,6 +35,8 @@ pub struct LoginPoll {
     message: String,
 }
 
+
+
 pub enum PollEnum {
     Success(LoginPoll, Session),
     Expire(LoginPoll),
@@ -35,21 +44,60 @@ pub enum PollEnum {
     UnConfirmed(LoginPoll),
 }
 
-define_api_get!(poll,"https://passport.bilibili.com/x/passport-login/web/qrcode/poll",qrcode_key);
-pub(crate) fn encode(url: impl AsRef<[u8]>) -> String {
-    let qrcode = QrCode::new(url).unwrap();
-    return qrcode.render::<char>()
-        .quiet_zone(false)
-        .module_dimensions(2, 1)
+pub enum QRCodeHandler{
+    Image(fn(img_name:&str)),
+    Text(fn(text_handler:&str))
+}
 
-        .build();
+define_api_get!(poll,"https://passport.bilibili.com/x/passport-login/web/qrcode/poll",qrcode_key);
+pub(crate) fn encode_to_text(url: impl AsRef<str>) -> String {
+    let qrcode = QRBuilder::new(url.as_ref()).build().unwrap();
+    qrcode.to_str()
+}
+
+pub(crate) fn encode_to_image(url: impl AsRef<str>, filename:impl AsRef<Path>){
+    let qrcode = QRBuilder::new(url.as_ref()).build().unwrap();
+    let _img = ImageBuilder::default()
+        .shape(Shape::RoundedSquare)
+        .background_color([255, 255, 255, 0]) // Handles transparency
+        .fit_width(600)
+        .to_file(&qrcode,filename.as_ref().to_str().unwrap());
+
 }
 
 
-pub async fn login(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> {
+fn random_name() -> String {
+    Uuid::new_v4().to_string() + ".png"
+}
+
+pub async fn login(handler: QRCodeHandler) -> BiliApiResult<Session> {
     let qr = generate().await;
     let LoginQRCode { url, qrcode_key } = qr.unwrap();
-    qrcode_handler(&encode(&url));
+    match handler {
+        QRCodeHandler::Image(img) => {
+            let name = random_name();
+            std::fs::create_dir("tmp");
+
+            let mut path_buf = PathBuf::new();
+            path_buf.push("tmp");
+            path_buf.push(&name);
+            encode_to_image(url,path_buf.as_path());
+            img(name.as_str())
+        },
+        QRCodeHandler::Text(text) => text(encode_to_text(url).as_str())
+    }
+    loop {
+        if let Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
+            return Ok(session);
+        }
+        sleep(Duration::from_secs(1)).await;
+    }
+}
+
+pub async fn login_with_img(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> {
+    let qr = generate().await;
+    let LoginQRCode { url, qrcode_key } = qr.unwrap();
+    qrcode_handler(&encode_to_text(&url));
     loop {
         if let Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
             return Ok(session);
@@ -63,7 +111,7 @@ pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
     let req = call_poll(qrcode_key.into());
     let resp = session.client.execute(req).await?.json::<RetData<LoginPoll>>().await?;
     if resp.code == 0 {
-        let resp  = resp.data.unwrap();
+        let resp = resp.data.unwrap();
         return Ok(match resp.code {
             0 => {
                 Success(resp, session)
@@ -97,11 +145,13 @@ pub async fn generate() -> BiliApiResult<LoginQRCode> {
 
 #[cfg(test)]
 mod test {
-    use crate::login::qrcode::{generate, login, LoginQRCode, poll, PollEnum};
+    use crate::login::qrcode::{generate, login, LoginQRCode, poll, PollEnum, QRCodeHandler};
 
     #[tokio::test]
     async fn test() {
-        let p = login(|x| { println!("{}", x) }).await.unwrap();
+        let p = login(QRCodeHandler::Image(|x|{
+            println!("{}", x);
+        })).await.unwrap();
         println!("{:?}", p.cookie_store);
     }
 }

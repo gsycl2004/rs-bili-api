@@ -108,13 +108,13 @@ async fn nav(session: &Session) -> BiliApiResult<Nav> {
 #[cfg(test)]
 mod test {
     use crate::login::info::nav;
-    use crate::login::qrcode::login;
+    use crate::login::qrcode::{login, QRCodeHandler};
 
     #[tokio::test]
     async fn test() {
-        let session = login(|x| {
+        let session = login(QRCodeHandler::Image(|x| {
             println!("{}", x);
-        }).await.unwrap();
+        })).await.unwrap();
         let t = nav(&session).await.unwrap();
         println!("{:?}", t);
     }
