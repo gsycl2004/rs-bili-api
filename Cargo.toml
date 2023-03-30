@@ -8,6 +8,8 @@ edition = "2021"
  name = "rs_bili_api"
  path = "src/lib.rs"
 
+[features]
+video = []
 
 [[test]]
  name = "test"

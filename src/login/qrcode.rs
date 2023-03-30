@@ -94,17 +94,6 @@ pub async fn login(handler: QRCodeHandler) -> BiliApiResult<Session> {
     }
 }
 
-pub async fn login_with_img(qrcode_handler: fn(text: &String)) -> BiliApiResult<Session> {
-    let qr = generate().await;
-    let LoginQRCode { url, qrcode_key } = qr.unwrap();
-    qrcode_handler(&encode_to_text(&url));
-    loop {
-        if let Success(_poll, session) = poll(&qrcode_key).await.unwrap() {
-            return Ok(session);
-        }
-        sleep(Duration::from_secs(1)).await;
-    }
-}
 
 pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
     let session = Session::new();
