@@ -59,7 +59,7 @@ pub(crate) fn encode_to_image(url: impl AsRef<str>, filename:impl AsRef<Path>){
     let qrcode = QRBuilder::new(url.as_ref()).build().unwrap();
     let _img = ImageBuilder::default()
         .shape(Shape::RoundedSquare)
-        .background_color([255, 255, 255, 0]) // Handles transparency
+        .background_color([255, 255, 255, 255]) // Handles transparency
         .fit_width(600)
         .to_file(&qrcode,filename.as_ref().to_str().unwrap());
 

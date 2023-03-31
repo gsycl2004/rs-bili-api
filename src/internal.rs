@@ -31,6 +31,10 @@ pub struct Session {
 }
 
 impl Session {
+    pub fn raw()->Session{
+        Session::new()
+    }
+
     pub(crate) fn new() -> Session {
         let p = Arc::new(CookieStoreMutex::new(CookieStore::default()));
         Session {

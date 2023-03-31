@@ -1,5 +1,5 @@
 pub mod login;
-#[cfg(feature = "webp")]
+#[cfg(feature = "video")]
 pub mod video;
 pub mod err;
 mod internal;

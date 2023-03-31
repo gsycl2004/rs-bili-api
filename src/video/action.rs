@@ -121,7 +121,7 @@ mod test {
     use crate::video::Video;
 
     #[tokio::test]
-    async fn test() {
+    async fn test_abcd() {
         let session = login(QRCodeHandler::Image(|x| {
             println!("{}", x);
         })).await.unwrap();

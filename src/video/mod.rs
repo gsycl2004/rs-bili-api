@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 mod action;
+mod info;
 
 const TABLE: &str = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
 const XOR: i64 = 177451812;
@@ -12,7 +13,9 @@ pub struct Video{
     bvid:String
 }
 
+
 impl Video{
+
     fn to_aid(&self) -> i64 {
         let x =  self.bvid.as_str();
         let mut map = HashMap::new();

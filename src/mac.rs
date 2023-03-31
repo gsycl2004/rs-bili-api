@@ -2,14 +2,14 @@
     ($name:ident,$url:literal,$($arg_name:ident),*) => {
         paste!{
         pub(crate) fn [<call_ $name>]($(
-        $arg_name:&String,
+        $arg_name:&str,
         )*)->Request{
                 let mut args = String::from($url);
                 args += "?";
                 $(
                     args += stringify!($arg_name);
                     args += "=";
-                    args += $arg_name.borrow();
+                    args += $arg_name;
                     args += "&";
                 )*
                 Request::new(Method::GET,Url::parse(&args).unwrap())
