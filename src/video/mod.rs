@@ -15,6 +15,22 @@ pub struct Video{
 
 
 impl Video{
+    fn from_aid(aid: i64) -> Video{
+        let x = (aid ^ XOR) + ADD;
+        let mut array = "BV          ".chars().collect::<Vec<_>>();
+        for (i, &idx) in MAGIC_ARRAY.iter().enumerate() {
+            let n = (x / 58i64.pow(i as u32)) % 58;
+            let c = TABLE.chars().nth(n as usize).unwrap();
+            array[idx] = c;
+        }
+        Video{
+            bvid:array.iter().collect()
+        }
+    }
+
+    fn from_bvid(bvid:String)->Video{
+        Video{ bvid }
+    }
 
     fn to_aid(&self) -> i64 {
         let x =  self.bvid.as_str();
