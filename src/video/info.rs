@@ -9,7 +9,8 @@ use reqwest::{Request,Method,Url};
 use crate::video::Video;
 define_api_get!(view,"https://api.bilibili.com/x/web-interface/view",bvid);
 define_api_get!(desc,"https://api.bilibili.com/x/web-interface/archive/desc",bvid);
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+define_api_get!(pagelist,"https://api.bilibili.com/x/player/pagelist",bvid);
+#[derive(Debug,Deserialize)]
 pub struct VideoInfo{
     pub bvid: String,
     pub aid: i64,
@@ -53,7 +54,7 @@ pub struct VideoInfo{
 
 fn default<T>()->Option<T>{None}
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct DescV2 {
     pub raw_text: String,
     #[serde(rename = "type")]
@@ -61,7 +62,7 @@ pub struct DescV2 {
     pub biz_id: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Rights {
     pub bp: i8,
     pub elec: i8,
@@ -83,14 +84,14 @@ pub struct Rights {
     pub free_watch: i32,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Owner {
     pub mid: i32,
     pub name: String,
     pub face: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Stat {
     pub aid: i64,
     pub view: i64,
@@ -107,14 +108,14 @@ pub struct Stat {
     pub argue_msg: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Dimension {
     pub width: i64,
     pub height: i64,
     pub rotate: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Page {
     pub cid: i64,
     pub page: i64,
@@ -126,20 +127,20 @@ pub struct Page {
     pub dimension: Dimension2,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Dimension2 {
     pub width: i64,
     pub height: i64,
     pub rotate: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Subtitle {
     pub allow_submit: bool,
     pub list: Vec<Value>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Staff {
     pub mid: i64,
     pub title: String,
@@ -151,7 +152,7 @@ pub struct Staff {
     pub label_style: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Vip {
     #[serde(rename = "type")]
     pub type_field: i64,
@@ -168,7 +169,7 @@ pub struct Vip {
     pub tv_vip_pay_type: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Label {
     pub path: String,
     pub text: String,
@@ -184,7 +185,7 @@ pub struct Label {
     pub img_label_uri_hant_static: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Official {
     pub role: i64,
     pub title: String,
@@ -193,17 +194,17 @@ pub struct Official {
     pub type_field: i64,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct UserGarb {
     pub url_image_ani_cut: String,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct HonorReply {
     pub honor: Vec<Honor>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+#[derive(Debug,Deserialize)]
 pub struct Honor {
     pub aid: i64,
     #[serde(rename = "type")]
@@ -211,6 +212,9 @@ pub struct Honor {
     pub desc: String,
     pub weekly_recommend_num: i64,
 }
+
+
+
 
 pub async fn view(session:&Session,video:&Video)->BiliApiResult<VideoInfo>{
     let data = session.client
@@ -240,11 +244,26 @@ pub async fn desc(session:&Session,video:&Video)->BiliApiResult<String>{
 
 }
 
+pub async fn pagelist(session:&Session,video:&Video)->BiliApiResult<Vec<Page>>{
+    let data = session.client
+        .execute(call_pagelist(video.bvid.as_str()))
+        .await?
+        .json::<RetData<Vec<Page>>>()
+        .await?;
+
+    if data.code == 0 {
+        return Ok(data.data.unwrap());
+    }
+    data.into()
+
+}
+
+
 #[cfg(test)]
 mod test {
     use crate::login::qrcode::{login, QRCodeHandler};
     use crate::video::action::{coin, deal, like, triple};
-    use crate::video::info::{desc, view, Vip};
+    use crate::video::info::{desc, pagelist, view, Vip};
     use crate::video::Video;
 
     #[tokio::test]
@@ -256,7 +275,7 @@ mod test {
             bvid: String::from("BV1tX4y1d7bj")
         };
 
-        println!("{:?}", desc(&session, &video).await.unwrap());
+        println!("{:?}", pagelist(&session, &video).await.unwrap());
 
     }
 }
