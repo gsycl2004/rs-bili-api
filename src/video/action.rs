@@ -68,6 +68,7 @@ pub async fn coin(session: &Session, video: &Video, multiply: i32, select_like: 
     }
     Err(ErrorCode(result.message, result.code))
 }
+
 ///[detail](https://github.com/gsycl2004/bilibili-API-collect/blob/master/docs/video/action.md#%E6%94%B6%E8%97%8F%E8%A7%86%E9%A2%91%E5%8F%8C%E7%AB%AF)
 pub async fn deal(session: &Session, video: &Video, add_media_ids: Option<i32>, del_media_ids: Option<i32>) -> Result<PromptResult, BiliBiliApiError> {
     let csrf = session.get_csrf();
