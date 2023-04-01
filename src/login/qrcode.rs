@@ -103,6 +103,7 @@ pub async fn poll(qrcode_key: impl Into<&String>) -> BiliApiResult<PollEnum> {
         let resp = resp.data.unwrap();
         return Ok(match resp.code {
             0 => {
+                session.client.execute(session.client.get("https://www.bilibili.com").build().unwrap()).await?;
                 Success(resp, session)
             }
             86038 => {

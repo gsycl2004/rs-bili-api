@@ -28,8 +28,8 @@ impl Video{
         }
     }
 
-    fn from_bvid(bvid:String)->Video{
-        Video{ bvid }
+    fn from_bvid(bvid: &str) ->Video{
+        Video{ bvid:bvid.to_string()}
     }
 
     fn to_aid(&self) -> i64 {

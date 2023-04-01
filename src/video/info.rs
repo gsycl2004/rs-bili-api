@@ -8,7 +8,7 @@ use paste::paste;
 use reqwest::{Request,Method,Url};
 use crate::video::Video;
 define_api_get!(view,"https://api.bilibili.com/x/web-interface/view",bvid);
-
+define_api_get!(desc,"https://api.bilibili.com/x/web-interface/archive/desc",bvid);
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct VideoInfo{
     pub bvid: String,
@@ -226,11 +226,25 @@ pub async fn view(session:&Session,video:&Video)->BiliApiResult<VideoInfo>{
 
 }
 
+pub async fn desc(session:&Session,video:&Video)->BiliApiResult<String>{
+    let data = session.client
+        .execute(call_desc(video.bvid.as_str()))
+        .await?
+        .json::<RetData<String>>()
+        .await?;
+
+    if data.code == 0 {
+        return Ok(data.data.unwrap());
+    }
+    data.into()
+
+}
+
 #[cfg(test)]
 mod test {
     use crate::login::qrcode::{login, QRCodeHandler};
     use crate::video::action::{coin, deal, like, triple};
-    use crate::video::info::{view, Vip};
+    use crate::video::info::{desc, view, Vip};
     use crate::video::Video;
 
     #[tokio::test]
@@ -242,7 +256,7 @@ mod test {
             bvid: String::from("BV1tX4y1d7bj")
         };
 
-        println!("{:?}", view(&session, &video).await.unwrap());
+        println!("{:?}", desc(&session, &video).await.unwrap());
 
     }
 }

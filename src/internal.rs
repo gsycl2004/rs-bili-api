@@ -39,7 +39,8 @@ impl Session {
         let p = Arc::new(CookieStoreMutex::new(CookieStore::default()));
         Session {
             cookie_store: Arc::clone(&p),
-            client: Client::builder().cookie_store(true)
+            client: Client::builder()
+                .cookie_store(true)
                 .cookie_provider(Arc::clone(&p))
                 .build()
                 .unwrap(),

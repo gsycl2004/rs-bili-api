@@ -11,7 +11,7 @@ use crate::video::Video;
 define_api_post!(like,"https://api.bilibili.com/x/web-interface/archive/like",bvid,like,csrf);
 define_api_post!(coin,"https://api.bilibili.com/x/web-interface/coin/add",bvid,multiply,select_like,csrf);
 define_api_post!(deal,"https://api.bilibili.com/medialist/gateway/coll/resource/deal",rid,r#type,add_media_ids,del_media_ids,csrf);
-define_api_post!(triple,"https://api.bilibili.com/x/web-interface/archive/like/triple",bvid,csrf);
+define_api_post!(triple,"https://api.bilibili.com/x/web-interface/archive/like/triple",bvid,csrf,eab_x,source,ga,ramval);
 define_api_post!(share,"https://api.bilibili.com/x/web-interface/share/add",bvid,csrf);
 
 
@@ -100,7 +100,7 @@ pub async fn deal(session: &Session, video: &Video, add_media_ids: Option<i32>, 
 pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
     let csrf = session.get_csrf();
     let result = session.client
-        .execute(call_triple(&session.client, video.bvid.as_str(),csrf.as_str()))
+        .execute(call_triple(&session.client, video.bvid.as_str(),csrf.as_str(),"2","web_normal","1","1"))
 
         .await?
         .json::<RetData<TripleResult>>()
@@ -116,6 +116,10 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
 
 #[cfg(test)]
 mod test {
+    use std::time::Duration;
+    use reqwest::cookie::CookieStore;
+    use crate::err::BiliApiResult;
+    use crate::internal::Session;
     use crate::login::qrcode::{login, QRCodeHandler};
     use crate::video::action::{coin, deal, like, triple};
     use crate::video::Video;
@@ -125,13 +129,16 @@ mod test {
         let session = login(QRCodeHandler::Image(|x| {
             println!("{}", x);
         })).await.unwrap();
-        let video = Video {
-            bvid: String::from("BV1tX4y1d7bj")
-        };
-
-        like(&session, &video, 2).await;
-        coin(&session, &video, 2, false).await;
-        deal(&session, &video, Some(106709609), None).await;
+        println!("{:?}", session.cookie_store);
+        for i in 170001 + 400..(170001 + 3200) {
+            tokio::time::sleep(Duration::from_secs(5)).await;
+            println!("{:?}", match triple(&session, &Video::from_aid(i)).await {
+                Ok(success) => {Some(success) }
+                Err(_) => {
+                    None
+                }
+            });
+        }
 
     }
 }
