@@ -261,8 +261,7 @@ pub async fn pagelist(session:&Session,video:&Video)->BiliApiResult<Vec<Page>>{
 #[cfg(test)]
 mod test {
     use crate::login::qrcode::{login, QRCodeHandler};
-    use crate::video::action::{coin, deal, like, triple};
-    use crate::video::info::{desc, pagelist, view, Vip};
+    use crate::video::info::pagelist;
     use crate::video::Video;
 
     #[tokio::test]

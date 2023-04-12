@@ -129,7 +129,7 @@ pub async fn generate() -> BiliApiResult<LoginQRCode> {
 
 #[cfg(test)]
 mod test {
-    use crate::login::qrcode::{generate, login, LoginQRCode, poll, PollEnum, QRCodeHandler};
+    use crate::login::qrcode::{login, QRCodeHandler};
 
     #[tokio::test]
     async fn test() {

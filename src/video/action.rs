@@ -14,10 +14,10 @@ define_api_post!(share,"https://api.bilibili.com/x/web-interface/share/add",bvid
 
 
 #[derive(Deserialize, Debug)]
-struct LikeRet {
-    code: i32,
-    message: String,
-    ttl: i32,
+pub struct LikeRet {
+    pub code: i32,
+    pub message: String,
+    pub ttl: i32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -116,11 +116,8 @@ pub async fn triple(session:&Session,video:&Video)->BiliApiResult<TripleResult>{
 #[cfg(test)]
 mod test {
     use std::time::Duration;
-    use reqwest::cookie::CookieStore;
-    use crate::err::BiliApiResult;
-    use crate::internal::Session;
     use crate::login::qrcode::{login, QRCodeHandler};
-    use crate::video::action::{coin, deal, like, triple};
+    use crate::video::action::{triple};
     use crate::video::Video;
 
     #[tokio::test]

@@ -9,8 +9,10 @@ edition = "2021"
  path = "src/lib.rs"
 
 [features]
-default = ["video"]
+default = ["video","live","user"]
 video = []
+live = []
+user = []
 
 [[test]]
  name = "test"

@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde_json::Value;
-
 use crate::err::BiliApiResult;
 use crate::internal::{RetData, Session};
 
@@ -63,14 +62,14 @@ pub struct Official {
     pub role: i32,
     pub title: String,
     pub desc: String,
-    #[serde(rename(serialize = "type", deserialize = "type"))]
+    #[serde(rename(deserialize = "type"))]
     pub type_name: i8,
 }
 
 
 #[derive(Deserialize, Debug)]
 pub struct OfficialVerify {
-    #[serde(rename(serialize = "type", deserialize = "type"))]
+    #[serde(rename(deserialize = "type"))]
     pub type_name: i8,
     pub desc: String,
 }

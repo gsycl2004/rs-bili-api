@@ -1,7 +1,8 @@
 use std::collections::HashMap;
-mod action;
-mod info;
-mod online;
+pub mod action;
+pub mod info;
+pub mod online;
+
 
 const TABLE: &str = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF";
 const XOR: i64 = 177451812;
@@ -15,7 +16,7 @@ pub struct Video{
 
 
 impl Video{
-    fn from_aid(aid: i64) -> Video{
+    pub fn from_aid(aid: i64) -> Video{
         let x = (aid ^ XOR) + ADD;
         let mut array = "BV          ".chars().collect::<Vec<_>>();
         for (i, &idx) in MAGIC_ARRAY.iter().enumerate() {
@@ -28,11 +29,11 @@ impl Video{
         }
     }
 
-    fn from_bvid(bvid: &str) ->Video{
+    pub fn from_bvid(bvid: &str) ->Video{
         Video{ bvid:bvid.to_string()}
     }
 
-    fn to_aid(&self) -> i64 {
+    pub fn to_aid(&self) -> i64 {
         let x =  self.bvid.as_str();
         let mut map = HashMap::new();
         for (i, c) in TABLE.chars().enumerate() {

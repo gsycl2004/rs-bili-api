@@ -88,13 +88,7 @@ pub async fn exp(session: &Session) -> BiliApiResult<i32> {
 
 #[cfg(test)]
 mod test {
-    use std::borrow::Borrow;
-    use std::io::Read;
-
-    use flate2::read::GzDecoder;
-    use reqwest::{header, Method, Request};
-
-    use crate::login::member_center::{account, exp, reward, RewardData};
+    use crate::login::member_center::{account, exp, reward};
     use crate::login::qrcode::{login, QRCodeHandler};
 
     #[test]
