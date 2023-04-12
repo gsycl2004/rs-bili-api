@@ -1,7 +1,5 @@
 use serde::Deserialize;
 use crate::define_api_get;
-use paste::paste;
-use reqwest::{Request,Method,Url};
 use crate::err::BiliApiResult;
 use crate::err::BiliBiliApiError::ErrorCode;
 use crate::internal::{RetData, Session};

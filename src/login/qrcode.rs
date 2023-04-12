@@ -1,15 +1,9 @@
-use std::borrow::Borrow;
-use std::fmt::format;
-use std::fs::File;
-use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use fast_qr::convert::image::ImageBuilder;
 use fast_qr::convert::{Builder, Shape};
 
 use fast_qr::QRBuilder;
-use paste::paste;
-use reqwest::{Method, Request, Url};
 use serde::{Deserialize, Serialize};
 use tokio::time::sleep;
 use uuid::Uuid;

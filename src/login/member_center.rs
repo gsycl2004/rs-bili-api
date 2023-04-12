@@ -2,8 +2,6 @@ use std::borrow::Borrow;
 use std::io::Read;
 
 use flate2::read::GzDecoder;
-use paste::paste;
-use reqwest::{Method, Request, Url};
 use serde::Deserialize;
 
 use crate::define_api_get;

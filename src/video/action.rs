@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use paste::paste;
-use reqwest::{Client, Request};
 use serde::Deserialize;
 use crate::define_api_post;
 use crate::err::{BiliApiResult, BiliBiliApiError};

@@ -1,15 +1,14 @@
 use serde::Deserialize;
-use serde::Serialize;
 use serde_json::Value;
 use crate::define_api_get;
 use crate::err::BiliApiResult;
 use crate::internal::{RetData, Session};
-use paste::paste;
-use reqwest::{Request,Method,Url};
 use crate::video::Video;
 define_api_get!(view,"https://api.bilibili.com/x/web-interface/view",bvid);
 define_api_get!(desc,"https://api.bilibili.com/x/web-interface/archive/desc",bvid);
 define_api_get!(pagelist,"https://api.bilibili.com/x/player/pagelist",bvid);
+
+
 #[derive(Debug,Deserialize)]
 pub struct VideoInfo{
     pub bvid: String,

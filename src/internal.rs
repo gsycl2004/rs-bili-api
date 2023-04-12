@@ -15,8 +15,9 @@ pub(crate) struct RetData<T> {
     pub data: Option<T>,
 }
 
-fn default<T>()->Option<T>{None}
-
+fn default<T>() -> Option<T> {
+    None
+}
 
 impl<T> From<RetData<T>> for BiliApiResult<T> {
     fn from(value: RetData<T>) -> Self {
@@ -24,14 +25,13 @@ impl<T> From<RetData<T>> for BiliApiResult<T> {
     }
 }
 
-
 pub struct Session {
     pub(crate) cookie_store: Arc<CookieStoreMutex>,
     pub(crate) client: Client,
 }
 
 impl Session {
-    pub fn raw()->Session{
+    pub fn raw() -> Session {
         Session::new()
     }
 
@@ -47,15 +47,19 @@ impl Session {
         }
     }
 
-    pub(crate) fn get_csrf(&self) -> String{
-        self.cookie_store.lock().unwrap().get("bilibili.com", "/", "bili_jct").unwrap().value().to_string()
+    pub(crate) fn get_csrf(&self) -> String {
+        self.cookie_store
+            .lock()
+            .unwrap()
+            .get("bilibili.com", "/", "bili_jct")
+            .unwrap()
+            .value()
+            .to_string()
     }
 }
 
 #[cfg(test)]
 mod test {
     #[tokio::test]
-    async fn test() {
-
-    }
+    async fn test() {}
 }

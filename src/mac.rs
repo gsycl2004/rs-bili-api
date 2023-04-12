@@ -1,9 +1,9 @@
 #[macro_export] macro_rules! define_api_get {
     ($name:ident,$url:literal,$($arg_name:ident),*) => {
-        paste!{
+        paste::paste!{
         pub(crate) fn [<call_ $name>]($(
         $arg_name:&str,
-        )*)->Request{
+        )*)->reqwest::Request{
                 let mut args = String::from($url);
                 args += "?";
                 $(
@@ -12,7 +12,7 @@
                     args += $arg_name;
                     args += "&";
                 )*
-                Request::new(Method::GET,Url::parse(&args).unwrap())
+                reqwest::Request::new(reqwest::Method::GET,reqwest::Url::parse(&args).unwrap())
 
 
             }
@@ -23,12 +23,12 @@
 
 #[macro_export] macro_rules! define_api_post {
     ($name:ident,$url:literal,$($arg_name:ident),*) => {
-        paste!{
-        pub(crate) fn [<call_ $name>](client:&Client,
+        paste::paste!{
+        pub(crate) fn [<call_ $name>](client:&reqwest::Client,
         $(
         $arg_name:&str,
         )*
-        )->Request{
+        )->reqwest::Request{
 
                 let mut args:HashMap<String,&str> = HashMap::new();
                 $(
